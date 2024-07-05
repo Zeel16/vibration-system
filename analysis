@@ -1,0 +1,76 @@
+matlab-actions/setup-matlab@v2
+matlab-actions/run-build@v2
+matlab-actions/run-tests@v2
+% Parameters
+m = 1; % Mass (kg)
+k = 100; % Spring constant (N/m)
+c_critical = 2 * sqrt(m * k); % Critical damping coefficient
+
+% Time vector
+t = linspace(0, 10, 1000);
+
+% Initial conditions
+x0 = 1; % Initial displacement (m)
+v0 = 0; % Initial velocity (m/s)
+
+% Underdamped system (zeta < 1)
+zeta_underdamped = 0.5; % Damping ratio
+c_underdamped = zeta_underdamped * c_critical;
+omega_n = sqrt(k/m); % Natural frequency
+omega_d = omega_n * sqrt(1 - zeta_underdamped^2); % Damped natural frequency
+
+x_underdamped = exp(-zeta_underdamped * omega_n * t) .* (x0 * cos(omega_d * t) + (v0 + zeta_underdamped * omega_n * x0) / omega_d * sin(omega_d * t));
+
+% Critically damped system (zeta = 1)
+c_critical_damped = c_critical;
+zeta_critical = 1;
+
+x_critical = (x0 + (v0 + zeta_critical * omega_n * x0) * t) .* exp(-zeta_critical * omega_n * t);
+
+% Overdamped system (zeta > 1)
+zeta_overdamped = 1.5; % Damping ratio
+c_overdamped = zeta_overdamped * c_critical;
+omega_d_over = omega_n * sqrt(zeta_overdamped^2 - 1);
+
+x_overdamped = exp(-zeta_overdamped * omega_n * t) .* ((x0 + (v0 + zeta_overdamped * omega_n * x0) / omega_d_over) * exp(omega_d_over * t) + (x0 - (v0 + zeta_overdamped * omega_n * x0) / omega_d_over) * exp(-omega_d_over * t));
+
+promt=("Enter the value of damping coefficient (c): ");
+x=input(promt);
+promt=("Enter the value of spring coefficient (s)");
+y=input(promt);
+promt=("Enter value of mass in system(m)");
+z=input(promt);
+nat=y/z;
+w=sqrt(nat);
+freq = (2*z)*w;
+zeta = x/freq;
+a=x/(2*z);
+p= sqrt(1-(zeta)^2);
+delta=(2*pi*zeta)/p;
+fd=(1/(2*pi))*sqrt((w)^2-(a)^2);
+if zeta < 1
+    fprintf("System is Underdamped");
+    hold on;
+    plot(t, x_underdamped, 'r', 'DisplayName', 'Underdamped');
+    xlabel('Time (s)'); ylabel('Displacement (m)');
+    title('Displacement vs. Time for Different Damping Conditions');
+    legend show;
+    grid on;
+    hold off;
+elseif zeta ==1
+    fprintf("System is critically damped");
+    hold on;
+    plot(t, x_critical, 'g', 'DisplayName', 'Critically Damped');
+    xlabel('Time (s)');ylabel('Displacement (m)');
+    title('Displacement vs. Time for Different Damping Conditions');
+    legend show;grid on;
+    hold off;
+else zeta > 1
+    fprintf("System is Overdamped");
+    hold on;
+    plot(t, x_overdamped, 'b', 'DisplayName', 'Overdamped');
+    xlabel('Time (s)');ylabel('Displacement (m)');
+    title('Displacement vs. Time for Different Damping Conditions');
+    legend show;grid on;
+    hold off;
+end
